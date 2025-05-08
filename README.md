@@ -87,9 +87,8 @@ This will execute `myscript.nsh` with the provided arguments. The `run` function
 
 #### Plugin Support
 
-You can extend `nsh` with additional functionality by creating plugins. Simply create JavaScript files that use `shelljs` and add them to your `nsh` shell. You can then run your custom commands from within `nsh`.
-
-For example, you can create a custom `.nsh` script for your own functions and load it using the `run` command.
+You can extend `nsh` with additional functionality by creating plugins. Simply create JavaScript files that use `shelljs` see the wiki page of ShellJS: https://github.com/shelljs/shelljs/wiki/Using-ShellJS-Plugins
+Once added to your ShellJS, your `nsh` shell can reach them. You can then run your custom commands from within `nsh`.
 
 ---
 
