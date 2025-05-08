@@ -4,7 +4,7 @@
   "description": "A Node.js-based shell with REPL and script execution support.",
   "main": "nsh.js",
   "bin": {
-    "nsh": "./nsh.js"
+    "nsh": "nsh.js"
   },
   "scripts": {
     "start": "node nsh.js"
@@ -16,7 +16,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/nsh.git"
+    "url": "git+https://github.com/biensurerodezee/nsh.git"
   },
   "keywords": [
     "shell",
@@ -26,4 +26,3 @@
     "nsh"
   ]
 }
-
