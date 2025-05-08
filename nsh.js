@@ -35,23 +35,26 @@ r.context.cd = function (dir) {
 };
 
 // Add a `run` command
-r.context.run = function(file, args = []) {
+r.context.run = async function (file, args = []) {
   const scriptPath = path.resolve(file);
   if (fs.existsSync(scriptPath)) {
     const code = fs.readFileSync(scriptPath, 'utf8');
 
-    // Inject args directly into the REPL context temporarily
     r.context.args = args;
 
     try {
-      const result = vm.runInContext(code, r.context, { filename: scriptPath });
-      if (result !== undefined) {
+      const result = vm.runInContext(`(async () => { ${code} })()`, r.context, {
+        filename: scriptPath,
+      });
+
+      if (result && typeof result.then === 'function') {
+        await result;
+      } else if (result !== undefined) {
         console.log(result);
       }
     } catch (err) {
       console.error(`Error: ${err.message}`);
     } finally {
-      // Clean up args so they don't leak into future runs
       delete r.context.args;
     }
   } else {
@@ -92,12 +95,18 @@ function completer(line) {
 }
 
 // Handle direct execution
-const args = process.argv.slice(2);  // Exclude 'node' and 'nsh.js' / 'nsh' from args
-// If there are arguments, treat it as a script run
+const args = process.argv.slice(2);
 if (args.length >= 1) {
   const script = args[0];
   const scriptArgs = args.slice(1);
-  r.context.run(script, scriptArgs);
-  // and exit
-  r.context.exit();
+  // Await the promise of the run
+  (async () => {
+    try {
+      await r.context.run(script, scriptArgs);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      r.context.exit();
+    }
+  })();
 }

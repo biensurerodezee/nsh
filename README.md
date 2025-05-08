@@ -1,135 +1,187 @@
-# nsh - NodeJS Shell
-
-`nsh` is a simple, customizable shell built using Node.js and `shelljs`. It allows you to run shell commands interactively in a REPL environment, execute `.nsh` scripts, and even extend its functionality with plugins.
-
-### Features
-
-* **Interactive Shell**: Execute shell commands in an interactive Node.js shell.
-* **Script Execution**: Run `.nsh` script files, passing arguments if needed.
-* **History**: Command history is saved and loaded automatically.
-* **Extensibility**: Extend the shell using Node.js and `shelljs` commands.
-* **Plugins**: Easily create plugins to extend functionality.
 
 ---
 
-### Requirements
+# 🐚 nsh — Node.js Shell
 
-* **Node.js**: You will need to have Node.js installed.
-* **shelljs**: `shelljs` is used for all shell commands in the REPL, such as `ls`, `cd`, `pwd`, etc.
-
----
-
-### Installation
-
-1. **Clone or Download** this repository to your machine.
-
-2. **Install Dependencies**:
-   In the project directory, run:
-
-   ```bash
-   npm install
-   ```
-
-3. **Make the Script Executable**:
-   Add a shebang (`#!/usr/bin/env node`) at the top of the script (`nsh.js`), so it can be run as a standalone executable.
-
-   Change the permissions to make the script executable:
-
-   ```bash
-   chmod +x /path/to/nsh.js
-   ```
-
-4. **Create a Symlink**:
-   For easier access, you can create a symlink to make the script available globally:
-
-   ```bash
-   sudo ln -s /path/to/nsh.js /usr/local/bin/nsh
-   ```
-
-5. **Set `nsh` as Your Default Shell** (Optional):
-   To set `nsh` as your default shell, you can update the shell in `/etc/passwd` or use the following command:
-
-   ```bash
-   chsh -s /usr/local/bin/nsh
-   ```
-
-   After doing this, you may need to restart your terminal or log out and back in for the changes to take effect.
+A REPL-powered Node.js shell that combines the flexibility of JavaScript with shell-like capabilities via [ShellJS](https://github.com/shelljs/shelljs). Supports `.nsh` scripts, async functions, argument passing, and user plugins.
 
 ---
 
-### Usage
+## 📦 Install
 
-#### Starting the Interactive Shell
+Install globally via NPM:
 
-Once you’ve set it up, you can run `nsh` directly in your terminal:
+```bash
+npm install -g biensure-nsh
+```
+
+To run it locally (without installing globally):
+
+```bash
+npx nsh path/to/script.nsh
+```
+
+## 🚀 Usage
+
+### Launch Interactive Shell
 
 ```bash
 nsh
 ```
 
-This will start the interactive shell, and you'll see the prompt like this:
-
-```
-nsh:/home/username > 
-```
-
-You can execute any shell commands available via `shelljs` such as `ls`, `cd`, `pwd`, etc.
-
-#### Running `.nsh` Scripts
-
-You can also run `.nsh` script files using the `run` command:
+You'll see a prompt like:
 
 ```bash
-nsh myscript.nsh arg1 arg2
+nsh:/your/current/directory >
 ```
 
-This will execute `myscript.nsh` with the provided arguments. The `run` function allows you to pass arguments to your scripts, making it very flexible.
+Try some shell commands:
 
-#### Plugin Support
-
-You can extend `nsh` with additional functionality by creating plugins. Simply create JavaScript files that use `shelljs` see the wiki page of ShellJS: https://github.com/shelljs/shelljs/wiki/Using-ShellJS-Plugins
-Once added to your ShellJS, your `nsh` shell can reach them. You can then run your custom commands from within `nsh`.
-
----
-
-### How It Works
-
-1. **REPL Environment**: The REPL starts with the current directory as the prompt. `shelljs` commands are injected into the REPL, and you can use them just like you would in a typical shell.
-
-2. **`run` Command**: You can pass `.nsh` script files to the `run` command along with any arguments. The script will be executed in the REPL context, allowing you to interact with the shell as the script runs.
-
-3. **History Management**: Your shell history is saved automatically to `.nsh_history` in your home directory. This means you can access previously executed commands easily.
-
-4. **Extending the Shell**: By default, `nsh` uses `shelljs`, which offers a variety of shell commands. You can also create custom extensions or modify the behavior of `nsh` to suit your needs.
-
----
-
-### Example
-
-Here’s an example of a simple `.nsh` script that creates a file and lists the current directory contents:
-
-#### `createFile.nsh`
-
-```javascript
-// Create File
-var fs = require('fs');
-var data = 'This is a created file';
-
-// Write file
-fs.writeFileSync('file.txt', data);
-console.log('File is created successfully.');
-
-// List the current directory
+```js
 ls();
+cd('code');
+pwd();
 ```
 
-To run it:
+These are available because shelljs is loaded into the context of every .nsh script.
+
+You can use any JavaScript too:
+
+```js
+[1, 2, 3].map(x => x * 2);
+```
+
+---
+
+### Run a `.nsh` Script
 
 ```bash
-nsh createFile.nsh
+nsh path/to/script.nsh
 ```
 
-This will create a file named `file.txt` and list the contents of the current directory.
+Or pass arguments:
+
+```bash
+nsh test/myscript.nsh hello world
+```
+
+---
+
+## 📁 Script Example
+
+```js
+// test/example.nsh
+
+console.log("Hello from nsh script!");
+
+// Access CLI args
+args.forEach((a, i) => console.log(`arg[${i}] = ${a}`));
+
+// Use shelljs commands
+console.log('Directory listing:');
+console.log(ls().stdout);
+
+// Async support
+await new Promise(r => setTimeout(r, 1000));
+console.log("Waited 1 second.");
+```
+
+---
+
+## 🧠 Passing Arguments to Scripts
+
+Arguments passed on the command line are available as `args`:
+
+```bash
+nsh myscript.nsh foo bar
+```
+
+```js
+// inside myscript.nsh
+console.log(args);  // ['foo', 'bar']
+```
+
+---
+
+## ⏳ Async/Await Support
+
+All `.nsh` scripts run inside an `async` IIFE. So you can:
+
+✅ Use `await` at top-level
+✅ Perform file operations, HTTP requests, etc.
+
+```js
+const { readFile } = require('fs/promises');
+const content = await readFile('README.md', 'utf-8');
+console.log(content);
+```
+
+---
+
+## ✨ Make .nsh Scripts Executable
+
+To run .nsh scripts like regular shell scripts:
+1. Add a Shebang
+
+At the very top of your .nsh script, add:
+
+#!/usr/bin/env nsh
+
+2. Make It Executable
+
+Give it execute permissions:
+
+chmod +x yourscript.nsh
+
+3. Run It
+
+./yourscript.nsh arg1 arg2
+
+It will behave just like a Bash or Python script — but powered by Node.js and ShellJS.
+
+---
+
+## 🔌 Writing Plugins
+
+You can inject functionality into `nsh` via plugins.
+
+### Step 1: Create a `.js` file exporting functions
+
+```js
+// plugins/myplugin.js
+module.exports = {
+  hello: () => console.log("Hello from plugin!"),
+  double: x => x * 2
+};
+```
+
+### Step 2: Load it in `.nsh` script
+
+```js
+Object.assign(globalThis, require('../plugins/myplugin.js'));
+
+hello();       // → Hello from plugin!
+console.log(double(5));  // → 10
+```
+
+Or make it globally available in `nsh.js` if you want persistent commands.
+
+---
+
+## 📝 Roadmap
+
+* Plugin system autoloading
+* Command aliasing
+* Tab completion improvements
+* Script testing framework
+
+---
+
+## 🧑‍💻 Author
+
+Made by [@biensurerodezee](https://github.com/biensurerodezee)
+
+MIT License
 
 ---
 
@@ -151,10 +203,4 @@ You can extend or contribute to `nsh` by:
 
 ---
 
-### License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-This should give you a full understanding of how to use, extend, and set up `nsh` as your default shell. Let me know if anything is unclear or if you need further improvements!
+This should give you a full understanding of how to use, extend, or even set up `nsh` as your default shell :). Let me know if anything is unclear or if you need further improvements!
