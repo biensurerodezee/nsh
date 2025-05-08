@@ -1,5 +1,5 @@
 {
-  "name": "nsh",
+  "name": "biensure-nsh",
   "version": "1.0.0",
   "description": "A Node.js-based shell with REPL and script execution support.",
   "main": "nsh.js",
