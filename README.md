@@ -283,7 +283,7 @@ MIT License
 
 You can extend or contribute to `nsh` by:
 
-* Sharing your-created.nsh scripts by adding them to the example folder and create a pull request.
+* Sharing your-created.nsh scripts by adding them to the example/ folder and create a pull request.
 * Creating [ShellJS](https://github.com/shelljs/shelljs) based plugins to add custom functionality.
 * Opening an issue or submitting a pull request with any improvements.
 
