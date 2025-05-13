@@ -9,15 +9,27 @@ const path = require('path');
 const os = require('os');
 const vm = require('vm');
 
-// Location for storing REPL history
-const historyFile = path.join(os.homedir(), '.nsh_history');
+// Handle --version
+if (process.argv.includes('--version')) {
+  const { version } = require('./package.json');
+  console.log(version);
+  process.exit(0);
+}
 
 // Start REPL
 let currentDir = process.cwd();
 const r = repl.start({
   prompt: `nsh:${currentDir} > `,
-  completer: completer
+  completer: completer,
+  ignoreUndefined: true
 });
+
+// Location for storing REPL history
+const historyFile = path.join(os.homedir(), '.nsh_history');
+if (fs.existsSync(historyFile)) {
+  const historyLines = fs.readFileSync(historyFile, 'utf8').split('\n').reverse();
+  r.history.push(...historyLines.filter(line => line.trim() !== ''));
+}
 
 // Inject shelljs commands into the REPL context
 Object.assign(r.context, shell);
@@ -38,15 +50,17 @@ r.context.cd = function (dir) {
 r.context.run = async function (file, args = []) {
   const scriptPath = path.resolve(file);
   if (fs.existsSync(scriptPath)) {
-    const code = fs.readFileSync(scriptPath, 'utf8');
-
+    var code = fs.readFileSync(scriptPath, 'utf8');
+    // Remove shebang if present
+    if (code.startsWith('#!')) {
+      code = code.replace(/^#!.*\n/, '');
+    }
     r.context.args = args;
-
     try {
       const result = vm.runInContext(`(async () => { ${code} })()`, r.context, {
         filename: scriptPath,
       });
-
+      // Handle both promised and normal result
       if (result && typeof result.then === 'function') {
         await result;
       } else if (result !== undefined) {
@@ -62,9 +76,14 @@ r.context.run = async function (file, args = []) {
   }
 };
 
-// Add a `pwd` helper
-r.context.pwd = () => {
+// Add a console logged `pwd` helper
+r.context.pwdl = () => {
   console.log(shell.pwd().stdout);
+};
+
+// Add a console logged `ls` helper
+r.context.lsl = () => {
+  console.log(shell.ls().stdout);
 };
 
 // Load command history
@@ -73,16 +92,20 @@ if (fs.existsSync(historyFile)) {
   r.history.push(...historyLines.filter(line => line.trim() !== ''));
 }
 
-// Save history on exit
-r.on('exit', () => {
+// Add `exit` helper to save history
+r.context.exit = () => {
   try {
+    if( r.history.length > 250 ) r.history.length = 250;
     fs.writeFileSync(historyFile, r.history.reverse().join('\n'), 'utf8');
   } catch (err) {
     console.error('Error saving history:', err);
+  } finally {
+    process.exit();
   }
-  console.log('\nGoodbye!');
-  process.exit();
-});
+};
+
+// On CTRL+C run custom `exit` function
+r.on('exit', r.context.exit);
 
 // Auto-completion
 function completer(line) {
@@ -106,7 +129,7 @@ if (args.length >= 1) {
     } catch (err) {
       console.error(err);
     } finally {
-      r.context.exit();
+      setImmediate(() => r.context.exit());
     }
   })();
 }

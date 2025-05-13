@@ -1,18 +1,23 @@
 {
   "name": "biensure-nsh",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A Node.js-based shell with REPL and script execution support.",
   "main": "nsh.js",
   "bin": {
     "nsh": "nsh.js"
   },
   "scripts": {
-    "start": "node nsh.js"
+    "start": "node nsh.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "shelljs": "^0.8.5"
   },
-  "author": "Your Name",
+  "devDependencies": {
+    "vitest": "^1.6.1"
+  },
+  "author": "Rod van der Zee",
   "license": "MIT",
   "repository": {
     "type": "git",
