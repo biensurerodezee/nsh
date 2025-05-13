@@ -9,6 +9,9 @@ const path = require('path');
 const os = require('os');
 const vm = require('vm');
 
+// Maximum REPL history file length
+const maxHistoryLength = 250;
+
 // Handle --version
 if (process.argv.includes('--version')) {
   const { version } = require('./package.json');
@@ -95,7 +98,7 @@ if (fs.existsSync(historyFile)) {
 // Add `exit` helper to save history
 r.context.exit = () => {
   try {
-    if( r.history.length > 250 ) r.history.length = 250;
+    if( r.history.length > maxHistoryLength ) r.history.length = maxHistoryLength;
     fs.writeFileSync(historyFile, r.history.reverse().join('\n'), 'utf8');
   } catch (err) {
     console.error('Error saving history:', err);
@@ -107,12 +110,11 @@ r.context.exit = () => {
 // On CTRL+C run custom `exit` function
 r.on('exit', r.context.exit);
 
-// Auto-completion
+// Auto-complete
 function completer(line) {
   const shellCommands = Object.keys(shell);
   const fsEntries = fs.readdirSync(currentDir);
   const allOptions = shellCommands.concat(fsEntries);
-
   const hits = allOptions.filter(cmd => cmd.startsWith(line));
   return [hits.length ? hits : allOptions, line];
 }

@@ -90,10 +90,13 @@ nsh:/home/user/directory > ls()
 ]
 ```
 
-is because ShellJS commands return objects that contain possible sub functions:
+is because what you see is the output object from a ShellJS command.
+As you can see it contains `stdout`, `stderr`, `code` and some sub functions `exec(), .sort()...`
+
+These can be quite handy, look:
 
 ```bash
-nsh:/home/administrator/Projects/nsh > ls().sort()
+nsh:/home/user/directory > ls().sort()
 [String: 'LICENSE\n' +
   'node_modules\n' +
   'nsh.js\n' +
@@ -103,13 +106,18 @@ nsh:/home/administrator/Projects/nsh > ls().sort()
   'test\n'] {
 ...
 }
-
 ```
 
-if you only want the output just type:
+If don't want the big object and you only want the `stdout` just type:
 
 ```bash
-console.log(ls().stdout)
+console.log(ls().stdout);
+```
+
+Alternatively to get short ouput with the ShellJS command `echo();` simply add `undefined;`:
+
+```bash
+echo("hello"); undefined;
 ```
 
 ---
@@ -255,7 +263,7 @@ Of courses you can wrap any ShellJS command in console.log() and choose to only 
 
 You can inject functionality into `nsh` via the plugin system of ShellJS.
 Every plugin installed in ShellJS will be available within `nsh`.
-Read the [wiki](https://github.com/shelljs/shelljs/wiki/Using-ShellJS-Plugins) of how to install, write and share plugins.
+Read the [wiki](https://github.com/shelljs/shelljs/wiki/Using-ShellJS-Plugins) about how to install, write and share plugins.
 
 ---
 
@@ -271,7 +279,7 @@ MIT License
 
 * **Maximum Call Stack Size Exceeded**: This can happen if there's an infinite loop or recursion in your script. Make sure your scripts are not recursively calling themselves or running into circular dependencies.
 * **File Not Found**: If you get an error saying `File not found`, ensure the script path is correct and the file exists.
-* **Command Not Found**: Ensure you’ve correctly added `shelljs` commands into the REPL context.
+* **Command Not Found**: Ensure you’ve correctly added [ShellJS](https://github.com/shelljs/shelljs) commands, read the plugin [wiki](https://github.com/shelljs/shelljs/wiki/Using-ShellJS-Plugins).
 
 ---
 
