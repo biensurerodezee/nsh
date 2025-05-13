@@ -234,19 +234,15 @@ It will behave just like a Bash or Python script — but powered by Node.js and 
 
 ---
 
-## 🔌 Customized commands `pwdl` and `lsl`
+## 💼 Customized commands `pwdl` and `lsl`
 
 For testing purpose the `pwdl()` and `lsl()` command were added:
 ```js
-// Add a console logged `pwd` helper
-r.context.pwdl = () => {
-  console.log(shell.pwd().stdout);
-};
+// Added a console logged `pwd` helper command `pwdl()`
+console.log(pwd().stdout);
 
-// Add a console logged `ls` helper
-r.context.lsl = () => {
-  console.log(shell.ls().stdout);
-};
+// Added a console logged `ls` helper command `lsl()`
+console.log(ls().stdout);
 ```
 
 This way the result was quite a bit shorter and directly effective.
@@ -293,15 +289,15 @@ You can extend or contribute to `nsh` by:
 
 The project includes a robust test suite (using Vitest) to validate:
 
-- [x] Version output
-- [x] Script execution with and without args
-- [x] Async/await handling
-- [x] Missing and invalid scripts
-- [x] Runtime error messages
-- [x] Script execution via REPL
-- [x] Shebang handling
-- [x] REPL prompt updates on cd
-- [x] REPL history load/save
+- ✅ Version output
+- ✅ Script execution with and without args
+- ✅ Async/await handling
+- ✅ Missing and invalid scripts
+- ✅ Runtime error messages
+- ✅ Script execution via REPL
+- ✅ Shebang handling
+- ✅ REPL prompt updates on cd
+- ✅ REPL history load/save
 
 Tests are located in nsh.test.js and cover both CLI and REPL functionality.
 
